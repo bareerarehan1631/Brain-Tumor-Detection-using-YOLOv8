@@ -4,136 +4,36 @@ from PIL import Image
 import pandas as pd
 
 
-# ============================================================
-# PAGE CONFIGURATION
-# ============================================================
+# --------------------------------------------------
+# PAGE SETTINGS
+# --------------------------------------------------
 
 st.set_page_config(
     page_title="Brain Tumor Detection",
     page_icon="🧠",
-    layout="wide",
-    initial_sidebar_state="collapsed"
+    layout="wide"
 )
 
 
-# ============================================================
-# CUSTOM CSS
-# ============================================================
+# --------------------------------------------------
+# TITLE
+# --------------------------------------------------
 
-st.markdown(
-    """
-<style>
+st.title("🧠 Brain Tumor Detection")
 
-.stApp {
-    background-color: #f5f8fc;
-}
+st.subheader(
+    "AI-Powered Brain MRI Analysis using YOLOv8"
+)
 
-.block-container {
-    max-width: 1200px;
-    padding-top: 2rem;
-    padding-bottom: 3rem;
-}
-
-/* Main title */
-
-.main-title {
-    text-align: center;
-    font-size: 42px;
-    font-weight: 700;
-    color: #163f5f;
-    margin-bottom: 5px;
-}
-
-.main-subtitle {
-    text-align: center;
-    font-size: 18px;
-    color: #718096;
-    margin-bottom: 30px;
-}
-
-/* Status */
-
-.status {
-    text-align: center;
-    background-color: #eaf7ef;
-    border: 1px solid #c7e8d3;
-    color: #247044;
-    padding: 12px;
-    border-radius: 10px;
-    margin-bottom: 25px;
-    font-weight: 600;
-}
-
-/* Upload box */
-
-[data-testid="stFileUploader"] {
-    background-color: white;
-    border: 1px dashed #9db2c5;
-    border-radius: 14px;
-    padding: 15px;
-}
-
-/* Buttons */
-
-.stButton > button {
-    width: 100%;
-    height: 50px;
-    border-radius: 10px;
-    font-size: 17px;
-    font-weight: 600;
-}
-
-/* Result cards */
-
-.success-box {
-    background-color: #eaf7ef;
-    border-left: 5px solid #28a35a;
-    padding: 18px;
-    border-radius: 10px;
-    margin: 20px 0;
-}
-
-.warning-box {
-    background-color: #fff5df;
-    border-left: 5px solid #e3a21a;
-    padding: 18px;
-    border-radius: 10px;
-    margin: 20px 0;
-}
-
-.footer {
-    text-align: center;
-    color: #8996a5;
-    font-size: 13px;
-    margin-top: 30px;
-}
-
-</style>
-""",
-    unsafe_allow_html=True
+st.info(
+    "Upload a brain MRI image to analyze it using the "
+    "trained YOLOv8 detection model."
 )
 
 
-# ============================================================
-# HEADER
-# ============================================================
-
-st.markdown(
-    '<div class="main-title">🧠 Brain Tumor Detection</div>',
-    unsafe_allow_html=True
-)
-
-st.markdown(
-    '<div class="main-subtitle">'
-    'AI-Powered Brain MRI Analysis using YOLOv8'
-    '</div>',
-    unsafe_allow_html=True
-)
-
-
-# ============================================================
+# --------------------------------------------------
 # LOAD MODEL
-# ============================================================
+# --------------------------------------------------
 
 @st.cache_resource
 def load_model():
@@ -141,95 +41,82 @@ def load_model():
 
 
 try:
-
     model = load_model()
 
 except Exception as e:
 
-    st.error("Unable to load the trained model.")
+    st.error("❌ Unable to load the trained model.")
 
-    st.warning(
-        "Please make sure that 'best.pt' is present "
-        "in the same repository as app.py."
+    st.write(
+        "Please make sure that **best.pt** is in the same "
+        "folder as **app.py**."
     )
 
     st.stop()
 
 
-# ============================================================
-# MODEL STATUS
-# ============================================================
-
-st.markdown(
-    '<div class="status">'
-    '🟢 Model Ready &nbsp; | &nbsp; YOLOv8 &nbsp; | &nbsp; '
-    'Brain Tumor Detection'
-    '</div>',
-    unsafe_allow_html=True
+st.success(
+    "🟢 Model Ready — YOLOv8 Brain Tumor Detection"
 )
 
 
-# ============================================================
+# --------------------------------------------------
 # ABOUT
-# ============================================================
+# --------------------------------------------------
 
-with st.container(border=True):
+st.header("About the Application")
 
-    st.subheader("About the Application")
-
-    st.write(
-        "This application uses a trained YOLOv8 deep learning "
-        "model to analyze brain MRI images and identify "
-        "possible tumor regions."
-    )
-
-    st.write(
-        "Upload a brain MRI image below to generate AI-based "
-        "detection results, including detected regions and "
-        "confidence scores."
-    )
-
-
-# ============================================================
-# UPLOAD
-# ============================================================
-
-st.subheader("📤 Upload Brain MRI")
-
-st.caption(
-    "Upload a JPG, JPEG, or PNG brain MRI image for analysis."
+st.write(
+    "This application uses a trained YOLOv8 deep learning "
+    "model to analyze brain MRI images and identify "
+    "possible tumor regions."
 )
+
+st.write(
+    "Upload an MRI image below to view the model's "
+    "prediction, detected regions, and confidence scores."
+)
+
+
+# --------------------------------------------------
+# UPLOAD
+# --------------------------------------------------
+
+st.header("📤 Upload Brain MRI")
 
 uploaded_file = st.file_uploader(
-    "Choose MRI Image",
-    type=["jpg", "jpeg", "png"],
-    label_visibility="collapsed"
+    "Choose a brain MRI image",
+    type=["jpg", "jpeg", "png"]
 )
 
 
-# ============================================================
-# IMAGE PREVIEW
-# ============================================================
+# --------------------------------------------------
+# IMAGE ANALYSIS
+# --------------------------------------------------
 
 if uploaded_file is not None:
 
     try:
-
         image = Image.open(uploaded_file).convert("RGB")
 
     except Exception:
 
-        st.error("The uploaded file could not be read as an image.")
+        st.error(
+            "The uploaded file is not a valid image."
+        )
+
         st.stop()
 
 
-    st.subheader("🖼️ MRI Preview")
+    # --------------------------------------------------
+    # PREVIEW
+    # --------------------------------------------------
 
-    preview_col1, preview_col2, preview_col3 = st.columns(
-        [1, 2, 1]
-    )
+    st.header("🖼️ MRI Preview")
 
-    with preview_col2:
+    col1, col2, col3 = st.columns([1, 2, 1])
+
+    with col2:
 
         st.image(
             image,
@@ -238,27 +125,18 @@ if uploaded_file is not None:
         )
 
 
-    st.write("")
+    # --------------------------------------------------
+    # ANALYZE
+    # --------------------------------------------------
 
-
-    # ========================================================
-    # ANALYZE BUTTON
-    # ========================================================
-
-    analyze = st.button(
+    if st.button(
         "🔍 Analyze MRI",
-        type="primary"
-    )
-
-
-    # ========================================================
-    # PREDICTION
-    # ========================================================
-
-    if analyze:
+        type="primary",
+        use_container_width=True
+    ):
 
         with st.spinner(
-            "Analyzing MRI image with YOLOv8..."
+            "Analyzing MRI image..."
         ):
 
             try:
@@ -269,10 +147,10 @@ if uploaded_file is not None:
                     verbose=False
                 )
 
-            except Exception:
+            except Exception as e:
 
                 st.error(
-                    "An error occurred while analyzing the image."
+                    "An error occurred during prediction."
                 )
 
                 st.stop()
@@ -281,16 +159,16 @@ if uploaded_file is not None:
         result = results[0]
 
 
-        # ====================================================
+        # --------------------------------------------------
         # DETECTION IMAGE
-        # ====================================================
+        # --------------------------------------------------
 
-        plotted_image = result.plot()
+        detection_image = result.plot()
 
 
-        # ====================================================
-        # EXTRACT DETECTIONS
-        # ====================================================
+        # --------------------------------------------------
+        # DETECTIONS
+        # --------------------------------------------------
 
         detections = []
 
@@ -300,19 +178,19 @@ if uploaded_file is not None:
 
             confidence = float(box.conf[0])
 
-            label = result.names[class_id]
+            class_name = result.names[class_id]
 
             detections.append(
                 {
-                    "Detected Object": label,
+                    "Detected Object": class_name,
                     "Confidence": confidence
                 }
             )
 
 
-        # ====================================================
+        # --------------------------------------------------
         # RESULTS
-        # ====================================================
+        # --------------------------------------------------
 
         st.divider()
 
@@ -337,64 +215,52 @@ if uploaded_file is not None:
             st.subheader("YOLOv8 Detection")
 
             st.image(
-                plotted_image,
+                detection_image,
                 channels="BGR",
                 use_container_width=True
             )
 
 
-        # ====================================================
-        # RESULT STATUS
-        # ====================================================
+        # --------------------------------------------------
+        # NO DETECTION
+        # --------------------------------------------------
 
         if len(detections) == 0:
 
-            st.markdown(
-                """
-<div class="success-box">
-
-<b>✓ No Tumor Detected</b>
-
-<br><br>
-
-The model did not detect an object above the configured
-confidence threshold of 40%.
-
-</div>
-""",
-                unsafe_allow_html=True
+            st.success(
+                "✓ No Tumor Detected"
             )
+
+            st.write(
+                "The model did not detect an object above "
+                "the configured confidence threshold of 40%."
+            )
+
+
+        # --------------------------------------------------
+        # DETECTION FOUND
+        # --------------------------------------------------
 
         else:
 
-            st.markdown(
-                """
-<div class="warning-box">
+            st.warning(
+                "⚠ Possible Tumor Detected"
+            )
 
-<b>⚠ Possible Tumor Detected</b>
-
-<br><br>
-
-The model detected one or more regions in the uploaded
-MRI image.
-
-</div>
-""",
-                unsafe_allow_html=True
+            st.write(
+                "The model detected one or more regions "
+                "in the uploaded MRI image."
             )
 
 
-            # =================================================
-            # DETECTION DETAILS
-            # =================================================
-
             st.subheader("Detection Details")
 
-            display_data = []
+
+            table_data = []
 
             for detection in detections:
 
-                display_data.append(
+                table_data.append(
                     {
                         "Detected Object":
                             detection["Detected Object"],
@@ -405,7 +271,7 @@ MRI image.
                 )
 
 
-            df = pd.DataFrame(display_data)
+            df = pd.DataFrame(table_data)
 
 
             st.dataframe(
@@ -415,90 +281,60 @@ MRI image.
             )
 
 
-            # =================================================
-            # CONFIDENCE
-            # =================================================
-
             highest_confidence = max(
                 detection["Confidence"]
                 for detection in detections
             )
 
 
-            metric_col1, metric_col2, metric_col3 = st.columns(
-                [1, 2, 1]
+            st.metric(
+                "Highest Detection Confidence",
+                f"{highest_confidence * 100:.2f}%"
             )
 
 
-            with metric_col2:
-
-                st.metric(
-                    "Highest Detection Confidence",
-                    f"{highest_confidence * 100:.2f}%"
-                )
-
-
-# ============================================================
+# --------------------------------------------------
 # HOW IT WORKS
-# ============================================================
+# --------------------------------------------------
 
 st.divider()
 
-with st.container(border=True):
-
-    st.subheader("⚙️ How It Works")
-
-    st.markdown(
-        """
-**01 — Upload**
-
-Upload a brain MRI image in JPG, JPEG, or PNG format.
-
-**02 — AI Analysis**
-
-The trained YOLOv8 model analyzes the uploaded image.
-
-**03 — Detection**
-
-The model identifies possible tumor regions.
-
-**04 — Results**
-
-Bounding boxes and confidence scores are displayed for
-detected regions.
-"""
-    )
-
-
-# ============================================================
-# IMPORTANT NOTICE
-# ============================================================
-
-with st.container(border=True):
-
-    st.subheader("⚠️ Important Notice")
-
-    st.write(
-        "This application is developed for educational and "
-        "research purposes only."
-    )
-
-    st.write(
-        "The AI-generated results should not be considered "
-        "a medical diagnosis. Always consult a qualified "
-        "healthcare professional for medical interpretation."
-    )
-
-
-# ============================================================
-# FOOTER
-# ============================================================
+st.header("⚙️ How It Works")
 
 st.markdown(
     """
-<div class="footer">
-Brain Tumor Detection • YOLOv8 • Deep Learning • Streamlit
-</div>
-""",
-    unsafe_allow_html=True
+    **1. Upload:** Upload a brain MRI image.
+
+    **2. Analyze:** The trained YOLOv8 model analyzes the image.
+
+    **3. Detect:** The model identifies possible tumor regions.
+
+    **4. Results:** Bounding boxes and confidence scores are displayed.
+    """
+)
+
+
+# --------------------------------------------------
+# DISCLAIMER
+# --------------------------------------------------
+
+st.divider()
+
+st.header("⚠️ Important Notice")
+
+st.warning(
+    "This application is developed for educational and "
+    "research purposes only. The AI-generated results "
+    "should not be considered a medical diagnosis. "
+    "Always consult a qualified healthcare professional "
+    "for medical interpretation."
+)
+
+
+# --------------------------------------------------
+# FOOTER
+# --------------------------------------------------
+
+st.caption(
+    "Brain Tumor Detection • YOLOv8 • Deep Learning • Streamlit"
 )
