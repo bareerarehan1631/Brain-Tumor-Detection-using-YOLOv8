@@ -9,7 +9,7 @@ import pandas as pd
 # ============================================================
 
 st.set_page_config(
-    page_title="Brain Tumor Detection | YOLOv8",
+    page_title="Brain Tumor Detection",
     page_icon="🧠",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -22,132 +22,94 @@ st.set_page_config(
 
 st.markdown(
     """
-    <style>
+<style>
 
-    .stApp {
-        background-color: #f4f7fb;
-    }
+.stApp {
+    background-color: #f5f8fc;
+}
 
-    .block-container {
-        max-width: 1200px;
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-    }
+.block-container {
+    max-width: 1200px;
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+}
 
-    /* Header */
+/* Main title */
 
-    .main-title {
-        text-align: center;
-        font-size: 42px;
-        font-weight: 700;
-        color: #123b5d;
-        margin-bottom: 5px;
-    }
+.main-title {
+    text-align: center;
+    font-size: 42px;
+    font-weight: 700;
+    color: #163f5f;
+    margin-bottom: 5px;
+}
 
-    .main-subtitle {
-        text-align: center;
-        font-size: 18px;
-        color: #66788a;
-        margin-bottom: 30px;
-    }
+.main-subtitle {
+    text-align: center;
+    font-size: 18px;
+    color: #718096;
+    margin-bottom: 30px;
+}
 
-    /* Cards */
+/* Status */
 
-    .card {
-        background-color: white;
-        padding: 25px;
-        border-radius: 16px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
-        margin-bottom: 20px;
-    }
+.status {
+    text-align: center;
+    background-color: #eaf7ef;
+    border: 1px solid #c7e8d3;
+    color: #247044;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    font-weight: 600;
+}
 
-    .card-title {
-        font-size: 21px;
-        font-weight: 650;
-        color: #123b5d;
-        margin-bottom: 8px;
-    }
+/* Upload box */
 
-    .card-text {
-        color: #64748b;
-        font-size: 15px;
-        line-height: 1.7;
-    }
+[data-testid="stFileUploader"] {
+    background-color: white;
+    border: 1px dashed #9db2c5;
+    border-radius: 14px;
+    padding: 15px;
+}
 
-    /* Model status */
+/* Buttons */
 
-    .status-card {
-        background-color: #eaf7f0;
-        border: 1px solid #c7ead7;
-        border-radius: 12px;
-        padding: 15px 20px;
-        margin-bottom: 25px;
-        color: #17663b;
-        font-weight: 600;
-        text-align: center;
-    }
+.stButton > button {
+    width: 100%;
+    height: 50px;
+    border-radius: 10px;
+    font-size: 17px;
+    font-weight: 600;
+}
 
-    /* Detection result */
+/* Result cards */
 
-    .positive-result {
-        background-color: #fff4e5;
-        border-left: 5px solid #e39b16;
-        padding: 18px;
-        border-radius: 10px;
-        margin: 20px 0;
-    }
+.success-box {
+    background-color: #eaf7ef;
+    border-left: 5px solid #28a35a;
+    padding: 18px;
+    border-radius: 10px;
+    margin: 20px 0;
+}
 
-    .negative-result {
-        background-color: #eaf7f0;
-        border-left: 5px solid #24a05a;
-        padding: 18px;
-        border-radius: 10px;
-        margin: 20px 0;
-    }
+.warning-box {
+    background-color: #fff5df;
+    border-left: 5px solid #e3a21a;
+    padding: 18px;
+    border-radius: 10px;
+    margin: 20px 0;
+}
 
-    .result-title {
-        font-size: 20px;
-        font-weight: 700;
-        color: #183b56;
-    }
+.footer {
+    text-align: center;
+    color: #8996a5;
+    font-size: 13px;
+    margin-top: 30px;
+}
 
-    .result-text {
-        color: #64748b;
-        margin-top: 5px;
-    }
-
-    /* Upload box */
-
-    [data-testid="stFileUploader"] {
-        background-color: white;
-        border: 1px dashed #9db2c5;
-        border-radius: 15px;
-        padding: 15px;
-    }
-
-    /* Button */
-
-    .stButton > button {
-        width: 100%;
-        height: 50px;
-        border-radius: 10px;
-        font-size: 17px;
-        font-weight: 600;
-    }
-
-    /* Footer */
-
-    .footer {
-        text-align: center;
-        color: #8795a5;
-        font-size: 13px;
-        padding-top: 25px;
-        padding-bottom: 10px;
-    }
-
-    </style>
-    """,
+</style>
+""",
     unsafe_allow_html=True
 )
 
@@ -170,7 +132,7 @@ st.markdown(
 
 
 # ============================================================
-# LOAD TRAINED MODEL
+# LOAD MODEL
 # ============================================================
 
 @st.cache_resource
@@ -179,16 +141,16 @@ def load_model():
 
 
 try:
+
     model = load_model()
 
 except Exception as e:
-    st.error(
-        "Unable to load the trained model."
-    )
 
-    st.info(
-        "Please make sure that best.pt is uploaded to the "
-        "same repository folder as app.py."
+    st.error("Unable to load the trained model.")
+
+    st.warning(
+        "Please make sure that 'best.pt' is present "
+        "in the same repository as app.py."
     )
 
     st.stop()
@@ -199,97 +161,69 @@ except Exception as e:
 # ============================================================
 
 st.markdown(
-    """
-    <div class="status-card">
-        🟢 Model Ready &nbsp; | &nbsp;
-        YOLOv8 &nbsp; | &nbsp;
-        Brain Tumor Detection
-    </div>
-    """,
+    '<div class="status">'
+    '🟢 Model Ready &nbsp; | &nbsp; YOLOv8 &nbsp; | &nbsp; '
+    'Brain Tumor Detection'
+    '</div>',
     unsafe_allow_html=True
 )
 
 
 # ============================================================
-# ABOUT APPLICATION
+# ABOUT
 # ============================================================
 
-st.markdown(
-    """
-    <div class="card">
+with st.container(border=True):
 
-        <div class="card-title">
-            About the Application
-        </div>
+    st.subheader("About the Application")
 
-        <div class="card-text">
+    st.write(
+        "This application uses a trained YOLOv8 deep learning "
+        "model to analyze brain MRI images and identify "
+        "possible tumor regions."
+    )
 
-            This application uses a trained YOLOv8 deep learning
-            model to analyze brain MRI images and identify
-            possible tumor regions.
+    st.write(
+        "Upload a brain MRI image below to generate AI-based "
+        "detection results, including detected regions and "
+        "confidence scores."
+    )
 
-            <br><br>
 
-            Upload a brain MRI image below to generate
-            AI-based detection results, including detected
-            regions and confidence scores.
+# ============================================================
+# UPLOAD
+# ============================================================
 
-        </div>
+st.subheader("📤 Upload Brain MRI")
 
-    </div>
-    """,
-    unsafe_allow_html=True
+st.caption(
+    "Upload a JPG, JPEG, or PNG brain MRI image for analysis."
 )
-
-
-# ============================================================
-# UPLOAD SECTION
-# ============================================================
-
-st.markdown(
-    """
-    <div class="card">
-
-        <div class="card-title">
-            📤 Upload Brain MRI
-        </div>
-
-        <div class="card-text">
-            Select a JPG, JPEG, or PNG brain MRI image.
-        </div>
-
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
 
 uploaded_file = st.file_uploader(
-    "Upload MRI Image",
+    "Choose MRI Image",
     type=["jpg", "jpeg", "png"],
     label_visibility="collapsed"
 )
 
 
 # ============================================================
-# IMAGE ANALYSIS
+# IMAGE PREVIEW
 # ============================================================
 
 if uploaded_file is not None:
 
     try:
+
         image = Image.open(uploaded_file).convert("RGB")
 
     except Exception:
+
         st.error("The uploaded file could not be read as an image.")
         st.stop()
 
 
-    # ========================================================
-    # IMAGE PREVIEW
-    # ========================================================
-
-    st.markdown("### 🖼️ MRI Preview")
+    st.subheader("🖼️ MRI Preview")
 
     preview_col1, preview_col2, preview_col3 = st.columns(
         [1, 2, 1]
@@ -318,7 +252,7 @@ if uploaded_file is not None:
 
 
     # ========================================================
-    # MODEL PREDICTION
+    # PREDICTION
     # ========================================================
 
     if analyze:
@@ -335,7 +269,7 @@ if uploaded_file is not None:
                     verbose=False
                 )
 
-            except Exception as e:
+            except Exception:
 
                 st.error(
                     "An error occurred while analyzing the image."
@@ -348,7 +282,7 @@ if uploaded_file is not None:
 
 
         # ====================================================
-        # CREATE DETECTION IMAGE
+        # DETECTION IMAGE
         # ====================================================
 
         plotted_image = result.plot()
@@ -377,24 +311,20 @@ if uploaded_file is not None:
 
 
         # ====================================================
-        # RESULTS HEADER
+        # RESULTS
         # ====================================================
 
         st.divider()
 
-        st.markdown("## 📊 Analysis Results")
+        st.header("📊 Analysis Results")
 
-
-        # ====================================================
-        # ORIGINAL IMAGE / DETECTION IMAGE
-        # ====================================================
 
         result_col1, result_col2 = st.columns(2)
 
 
         with result_col1:
 
-            st.markdown("### Original MRI")
+            st.subheader("Original MRI")
 
             st.image(
                 image,
@@ -404,7 +334,7 @@ if uploaded_file is not None:
 
         with result_col2:
 
-            st.markdown("### YOLOv8 Detection")
+            st.subheader("YOLOv8 Detection")
 
             st.image(
                 plotted_image,
@@ -414,47 +344,42 @@ if uploaded_file is not None:
 
 
         # ====================================================
-        # DETECTION STATUS
+        # RESULT STATUS
         # ====================================================
 
         if len(detections) == 0:
 
             st.markdown(
                 """
-                <div class="negative-result">
+<div class="success-box">
 
-                    <div class="result-title">
-                        ✓ No Tumor Detected
-                    </div>
+<b>✓ No Tumor Detected</b>
 
-                    <div class="result-text">
-                        No object was detected above the
-                        configured confidence threshold of 40%.
-                    </div>
+<br><br>
 
-                </div>
-                """,
+The model did not detect an object above the configured
+confidence threshold of 40%.
+
+</div>
+""",
                 unsafe_allow_html=True
             )
-
 
         else:
 
             st.markdown(
                 """
-                <div class="positive-result">
+<div class="warning-box">
 
-                    <div class="result-title">
-                        ⚠ Possible Tumor Detected
-                    </div>
+<b>⚠ Possible Tumor Detected</b>
 
-                    <div class="result-text">
-                        The model detected one or more regions
-                        in the uploaded MRI image.
-                    </div>
+<br><br>
 
-                </div>
-                """,
+The model detected one or more regions in the uploaded
+MRI image.
+
+</div>
+""",
                 unsafe_allow_html=True
             )
 
@@ -463,11 +388,9 @@ if uploaded_file is not None:
             # DETECTION DETAILS
             # =================================================
 
-            st.markdown("### Detection Details")
-
+            st.subheader("Detection Details")
 
             display_data = []
-
 
             for detection in detections:
 
@@ -493,7 +416,7 @@ if uploaded_file is not None:
 
 
             # =================================================
-            # HIGHEST CONFIDENCE
+            # CONFIDENCE
             # =================================================
 
             highest_confidence = max(
@@ -510,8 +433,8 @@ if uploaded_file is not None:
             with metric_col2:
 
                 st.metric(
-                    label="Highest Detection Confidence",
-                    value=f"{highest_confidence * 100:.2f}%"
+                    "Highest Detection Confidence",
+                    f"{highest_confidence * 100:.2f}%"
                 )
 
 
@@ -521,72 +444,50 @@ if uploaded_file is not None:
 
 st.divider()
 
-st.markdown(
-    """
-    <div class="card">
+with st.container(border=True):
 
-        <div class="card-title">
-            ⚙️ How It Works
-        </div>
+    st.subheader("⚙️ How It Works")
 
-        <div class="card-text">
+    st.markdown(
+        """
+**01 — Upload**
 
-            <b>01 — Upload</b><br>
-            Upload a brain MRI image in JPG, JPEG, or PNG format.
+Upload a brain MRI image in JPG, JPEG, or PNG format.
 
-            <br><br>
+**02 — AI Analysis**
 
-            <b>02 — AI Analysis</b><br>
-            The trained YOLOv8 model analyzes the uploaded image.
+The trained YOLOv8 model analyzes the uploaded image.
 
-            <br><br>
+**03 — Detection**
 
-            <b>03 — Detection</b><br>
-            The model identifies possible tumor regions.
+The model identifies possible tumor regions.
 
-            <br><br>
+**04 — Results**
 
-            <b>04 — Results</b><br>
-            Bounding boxes and confidence scores are displayed
-            for detected regions.
-
-        </div>
-
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+Bounding boxes and confidence scores are displayed for
+detected regions.
+"""
+    )
 
 
 # ============================================================
 # IMPORTANT NOTICE
 # ============================================================
 
-st.markdown(
-    """
-    <div class="card">
+with st.container(border=True):
 
-        <div class="card-title">
-            ⚠️ Important Notice
-        </div>
+    st.subheader("⚠️ Important Notice")
 
-        <div class="card-text">
+    st.write(
+        "This application is developed for educational and "
+        "research purposes only."
+    )
 
-            This application is developed for educational
-            and research purposes only.
-
-            <br><br>
-
-            The AI-generated results should not be considered
-            a medical diagnosis. Always consult a qualified
-            healthcare professional for medical interpretation.
-
-        </div>
-
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+    st.write(
+        "The AI-generated results should not be considered "
+        "a medical diagnosis. Always consult a qualified "
+        "healthcare professional for medical interpretation."
+    )
 
 
 # ============================================================
@@ -595,15 +496,9 @@ st.markdown(
 
 st.markdown(
     """
-    <div class="footer">
-        Brain Tumor Detection
-        &nbsp;•&nbsp;
-        YOLOv8
-        &nbsp;•&nbsp;
-        Deep Learning
-        &nbsp;•&nbsp;
-        Streamlit
-    </div>
-    """,
+<div class="footer">
+Brain Tumor Detection • YOLOv8 • Deep Learning • Streamlit
+</div>
+""",
     unsafe_allow_html=True
 )
