@@ -1,4 +1,4 @@
-```python
+python
 import streamlit as st
 from ultralytics import YOLO
 from PIL import Image
@@ -503,4 +503,4 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-```
+
