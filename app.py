@@ -4,118 +4,146 @@ from PIL import Image
 import pandas as pd
 
 
-# =========================================================
+# ============================================================
 # PAGE CONFIGURATION
-# =========================================================
+# ============================================================
 
 st.set_page_config(
-    page_title="Brain Tumor Detection",
+    page_title="Brain Tumor Detection | YOLOv8",
     page_icon="🧠",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
 
-# =========================================================
+# ============================================================
 # CUSTOM CSS
-# =========================================================
+# ============================================================
 
 st.markdown(
     """
     <style>
 
-    /* Main page */
     .stApp {
-        background-color: #f7f9fc;
+        background-color: #f4f7fb;
+    }
+
+    .block-container {
+        max-width: 1200px;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
     }
 
     /* Header */
-    .main-header {
-        text-align: center;
-        padding: 25px 10px 10px 10px;
-    }
 
     .main-title {
+        text-align: center;
         font-size: 42px;
         font-weight: 700;
-        color: #16324F;
+        color: #123b5d;
         margin-bottom: 5px;
     }
 
-    .subtitle {
+    .main-subtitle {
+        text-align: center;
         font-size: 18px;
-        color: #5f6f7f;
-        margin-bottom: 20px;
+        color: #66788a;
+        margin-bottom: 30px;
     }
 
-    /* Information cards */
-    .info-card {
+    /* Cards */
+
+    .card {
         background-color: white;
-        padding: 22px;
-        border-radius: 14px;
-        border: 1px solid #e3e8ef;
+        padding: 25px;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
         margin-bottom: 20px;
-        box-shadow: 0px 3px 12px rgba(0,0,0,0.04);
     }
 
     .card-title {
-        font-size: 20px;
-        font-weight: 600;
-        color: #16324F;
+        font-size: 21px;
+        font-weight: 650;
+        color: #123b5d;
         margin-bottom: 8px;
     }
 
     .card-text {
-        color: #5f6f7f;
+        color: #64748b;
         font-size: 15px;
-        line-height: 1.6;
+        line-height: 1.7;
     }
 
-    /* Result cards */
-    .result-success {
-        background-color: #eaf8f0;
-        border-left: 5px solid #20a464;
-        padding: 18px;
-        border-radius: 10px;
-        margin: 15px 0;
+    /* Model status */
+
+    .status-card {
+        background-color: #eaf7f0;
+        border: 1px solid #c7ead7;
+        border-radius: 12px;
+        padding: 15px 20px;
+        margin-bottom: 25px;
+        color: #17663b;
+        font-weight: 600;
+        text-align: center;
     }
 
-    .result-warning {
-        background-color: #fff7df;
-        border-left: 5px solid #e5a900;
+    /* Detection result */
+
+    .positive-result {
+        background-color: #fff4e5;
+        border-left: 5px solid #e39b16;
         padding: 18px;
         border-radius: 10px;
-        margin: 15px 0;
+        margin: 20px 0;
+    }
+
+    .negative-result {
+        background-color: #eaf7f0;
+        border-left: 5px solid #24a05a;
+        padding: 18px;
+        border-radius: 10px;
+        margin: 20px 0;
     }
 
     .result-title {
-        font-size: 21px;
+        font-size: 20px;
         font-weight: 700;
+        color: #183b56;
+    }
+
+    .result-text {
+        color: #64748b;
+        margin-top: 5px;
     }
 
     /* Upload box */
+
     [data-testid="stFileUploader"] {
         background-color: white;
-        border-radius: 14px;
-        padding: 10px;
-        border: 1px solid #dfe5ec;
+        border: 1px dashed #9db2c5;
+        border-radius: 15px;
+        padding: 15px;
     }
 
     /* Button */
+
     .stButton > button {
         width: 100%;
-        border-radius: 10px;
         height: 50px;
+        border-radius: 10px;
         font-size: 17px;
         font-weight: 600;
     }
 
     /* Footer */
+
     .footer {
         text-align: center;
-        color: #7a8794;
+        color: #8795a5;
         font-size: 13px;
-        padding: 30px 0 10px 0;
+        padding-top: 25px;
+        padding-bottom: 10px;
     }
 
     </style>
@@ -124,56 +152,26 @@ st.markdown(
 )
 
 
-# =========================================================
+# ============================================================
 # HEADER
-# =========================================================
+# ============================================================
 
 st.markdown(
-    """
-    <div class="main-header">
+    '<div class="main-title">🧠 Brain Tumor Detection</div>',
+    unsafe_allow_html=True
+)
 
-        <div class="main-title">
-            🧠 Brain Tumor Detection
-        </div>
-
-        <div class="subtitle">
-            AI-Powered Brain MRI Analysis using YOLOv8
-        </div>
-
-    </div>
-    """,
+st.markdown(
+    '<div class="main-subtitle">'
+    'AI-Powered Brain MRI Analysis using YOLOv8'
+    '</div>',
     unsafe_allow_html=True
 )
 
 
-# =========================================================
-# INTRODUCTION
-# =========================================================
-
-st.markdown(
-    """
-    <div class="info-card">
-
-        <div class="card-title">
-            About the Application
-        </div>
-
-        <div class="card-text">
-            This application uses a trained YOLOv8 deep learning model
-            to detect possible brain tumors in MRI images.
-            Upload an MRI image below and the model will analyze the image
-            and display the detected region along with its confidence score.
-        </div>
-
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-
-# =========================================================
-# LOAD MODEL
-# =========================================================
+# ============================================================
+# LOAD TRAINED MODEL
+# ============================================================
 
 @st.cache_resource
 def load_model():
@@ -184,68 +182,134 @@ try:
     model = load_model()
 
 except Exception as e:
-
     st.error(
-        "Unable to load the trained model. "
-        "Please make sure 'best.pt' is present in the repository."
+        "Unable to load the trained model."
+    )
+
+    st.info(
+        "Please make sure that best.pt is uploaded to the "
+        "same repository folder as app.py."
     )
 
     st.stop()
 
 
-# =========================================================
-# IMAGE UPLOAD
-# =========================================================
+# ============================================================
+# MODEL STATUS
+# ============================================================
 
 st.markdown(
     """
-    <div class="card-title">
-        📤 Upload Brain MRI
+    <div class="status-card">
+        🟢 Model Ready &nbsp; | &nbsp;
+        YOLOv8 &nbsp; | &nbsp;
+        Brain Tumor Detection
     </div>
     """,
     unsafe_allow_html=True
 )
 
-uploaded_file = st.file_uploader(
-    "Choose an MRI image",
-    type=["jpg", "jpeg", "png"],
-    help="Upload a brain MRI image in JPG, JPEG, or PNG format."
+
+# ============================================================
+# ABOUT APPLICATION
+# ============================================================
+
+st.markdown(
+    """
+    <div class="card">
+
+        <div class="card-title">
+            About the Application
+        </div>
+
+        <div class="card-text">
+
+            This application uses a trained YOLOv8 deep learning
+            model to analyze brain MRI images and identify
+            possible tumor regions.
+
+            <br><br>
+
+            Upload a brain MRI image below to generate
+            AI-based detection results, including detected
+            regions and confidence scores.
+
+        </div>
+
+    </div>
+    """,
+    unsafe_allow_html=True
 )
 
 
-# =========================================================
-# IMAGE PREVIEW
-# =========================================================
+# ============================================================
+# UPLOAD SECTION
+# ============================================================
+
+st.markdown(
+    """
+    <div class="card">
+
+        <div class="card-title">
+            📤 Upload Brain MRI
+        </div>
+
+        <div class="card-text">
+            Select a JPG, JPEG, or PNG brain MRI image.
+        </div>
+
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+
+uploaded_file = st.file_uploader(
+    "Upload MRI Image",
+    type=["jpg", "jpeg", "png"],
+    label_visibility="collapsed"
+)
+
+
+# ============================================================
+# IMAGE ANALYSIS
+# ============================================================
 
 if uploaded_file is not None:
 
-    image = Image.open(uploaded_file)
+    try:
+        image = Image.open(uploaded_file).convert("RGB")
 
-    st.markdown(
-        """
-        <div class="card-title">
-            🖼️ Image Preview
-        </div>
-        """,
-        unsafe_allow_html=True
+    except Exception:
+        st.error("The uploaded file could not be read as an image.")
+        st.stop()
+
+
+    # ========================================================
+    # IMAGE PREVIEW
+    # ========================================================
+
+    st.markdown("### 🖼️ MRI Preview")
+
+    preview_col1, preview_col2, preview_col3 = st.columns(
+        [1, 2, 1]
     )
 
-    col1, col2, col3 = st.columns([1, 2, 1])
-
-    with col2:
+    with preview_col2:
 
         st.image(
             image,
-            caption="Uploaded MRI Image",
+            caption="Uploaded Brain MRI",
             use_container_width=True
         )
 
 
-    # =====================================================
-    # ANALYZE BUTTON
-    # =====================================================
+    st.write("")
 
-    st.markdown("<br>", unsafe_allow_html=True)
+
+    # ========================================================
+    # ANALYZE BUTTON
+    # ========================================================
 
     analyze = st.button(
         "🔍 Analyze MRI",
@@ -253,42 +317,56 @@ if uploaded_file is not None:
     )
 
 
+    # ========================================================
+    # MODEL PREDICTION
+    # ========================================================
+
     if analyze:
 
-        # =================================================
-        # MODEL PREDICTION
-        # =================================================
+        with st.spinner(
+            "Analyzing MRI image with YOLOv8..."
+        ):
 
-        with st.spinner("Analyzing MRI image..."):
+            try:
 
-            results = model.predict(
-                source=image,
-                conf=0.4
-            )
+                results = model.predict(
+                    source=image,
+                    conf=0.4,
+                    verbose=False
+                )
+
+            except Exception as e:
+
+                st.error(
+                    "An error occurred while analyzing the image."
+                )
+
+                st.stop()
+
 
         result = results[0]
 
 
-        # =================================================
-        # DETECTION IMAGE
-        # =================================================
+        # ====================================================
+        # CREATE DETECTION IMAGE
+        # ====================================================
 
         plotted_image = result.plot()
 
 
-        # =================================================
-        # DETECTION DATA
-        # =================================================
+        # ====================================================
+        # EXTRACT DETECTIONS
+        # ====================================================
 
         detections = []
 
         for box in result.boxes:
 
-            cls_id = int(box.cls[0])
+            class_id = int(box.cls[0])
 
             confidence = float(box.conf[0])
 
-            label = result.names[cls_id]
+            label = result.names[class_id]
 
             detections.append(
                 {
@@ -298,29 +376,23 @@ if uploaded_file is not None:
             )
 
 
-        # =================================================
-        # RESULT SECTION
-        # =================================================
+        # ====================================================
+        # RESULTS HEADER
+        # ====================================================
 
         st.divider()
 
-        st.markdown(
-            """
-            <div class="card-title">
-                📊 Detection Results
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        st.markdown("## 📊 Analysis Results")
 
 
-        # =================================================
-        # SIDE-BY-SIDE IMAGES
-        # =================================================
+        # ====================================================
+        # ORIGINAL IMAGE / DETECTION IMAGE
+        # ====================================================
 
-        col1, col2 = st.columns(2)
+        result_col1, result_col2 = st.columns(2)
 
-        with col1:
+
+        with result_col1:
 
             st.markdown("### Original MRI")
 
@@ -329,9 +401,10 @@ if uploaded_file is not None:
                 use_container_width=True
             )
 
-        with col2:
 
-            st.markdown("### AI Detection")
+        with result_col2:
+
+            st.markdown("### YOLOv8 Detection")
 
             st.image(
                 plotted_image,
@@ -340,49 +413,45 @@ if uploaded_file is not None:
             )
 
 
-        # =================================================
-        # NO DETECTION
-        # =================================================
+        # ====================================================
+        # DETECTION STATUS
+        # ====================================================
 
         if len(detections) == 0:
 
             st.markdown(
                 """
-                <div class="result-warning">
+                <div class="negative-result">
 
                     <div class="result-title">
-                        ⚠️ No Tumor Detected
+                        ✓ No Tumor Detected
                     </div>
 
-                    <p>
-                        The model did not detect an object above
-                        the configured confidence threshold.
-                    </p>
+                    <div class="result-text">
+                        No object was detected above the
+                        configured confidence threshold of 40%.
+                    </div>
 
                 </div>
                 """,
                 unsafe_allow_html=True
             )
 
-
-        # =================================================
-        # TUMOR DETECTED
-        # =================================================
 
         else:
 
             st.markdown(
                 """
-                <div class="result-success">
+                <div class="positive-result">
 
                     <div class="result-title">
-                        🔎 Possible Tumor Detected
+                        ⚠ Possible Tumor Detected
                     </div>
 
-                    <p>
-                        The model detected one or more objects
+                    <div class="result-text">
+                        The model detected one or more regions
                         in the uploaded MRI image.
-                    </p>
+                    </div>
 
                 </div>
                 """,
@@ -390,26 +459,31 @@ if uploaded_file is not None:
             )
 
 
-            # =============================================
-            # DETECTION TABLE
-            # =============================================
+            # =================================================
+            # DETECTION DETAILS
+            # =================================================
+
+            st.markdown("### Detection Details")
+
 
             display_data = []
+
 
             for detection in detections:
 
                 display_data.append(
                     {
-                        "Detected Object": detection["Detected Object"],
-                        "Confidence": f"{detection['Confidence'] * 100:.2f}%"
+                        "Detected Object":
+                            detection["Detected Object"],
+
+                        "Confidence":
+                            f"{detection['Confidence'] * 100:.2f}%"
                     }
                 )
 
 
             df = pd.DataFrame(display_data)
 
-
-            st.markdown("### Detection Details")
 
             st.dataframe(
                 df,
@@ -418,41 +492,63 @@ if uploaded_file is not None:
             )
 
 
-            # =============================================
+            # =================================================
             # HIGHEST CONFIDENCE
-            # =============================================
+            # =================================================
 
             highest_confidence = max(
                 detection["Confidence"]
                 for detection in detections
             )
 
-            st.metric(
-                label="Highest Confidence",
-                value=f"{highest_confidence * 100:.2f}%"
+
+            metric_col1, metric_col2, metric_col3 = st.columns(
+                [1, 2, 1]
             )
 
 
-# =========================================================
-# INFORMATION SECTION
-# =========================================================
+            with metric_col2:
+
+                st.metric(
+                    label="Highest Detection Confidence",
+                    value=f"{highest_confidence * 100:.2f}%"
+                )
+
+
+# ============================================================
+# HOW IT WORKS
+# ============================================================
 
 st.divider()
 
 st.markdown(
     """
-    <div class="info-card">
+    <div class="card">
 
         <div class="card-title">
-            ℹ️ How It Works
+            ⚙️ How It Works
         </div>
 
         <div class="card-text">
 
-            <b>1.</b> Upload a brain MRI image.<br>
-            <b>2.</b> The trained YOLOv8 model analyzes the image.<br>
-            <b>3.</b> The model identifies detected regions.<br>
-            <b>4.</b> Bounding boxes and confidence scores are displayed.
+            <b>01 — Upload</b><br>
+            Upload a brain MRI image in JPG, JPEG, or PNG format.
+
+            <br><br>
+
+            <b>02 — AI Analysis</b><br>
+            The trained YOLOv8 model analyzes the uploaded image.
+
+            <br><br>
+
+            <b>03 — Detection</b><br>
+            The model identifies possible tumor regions.
+
+            <br><br>
+
+            <b>04 — Results</b><br>
+            Bounding boxes and confidence scores are displayed
+            for detected regions.
 
         </div>
 
@@ -462,13 +558,13 @@ st.markdown(
 )
 
 
-# =========================================================
-# DISCLAIMER
-# =========================================================
+# ============================================================
+# IMPORTANT NOTICE
+# ============================================================
 
 st.markdown(
     """
-    <div class="info-card">
+    <div class="card">
 
         <div class="card-title">
             ⚠️ Important Notice
@@ -476,11 +572,14 @@ st.markdown(
 
         <div class="card-text">
 
-            This application is developed for educational and
-            research purposes only. The results generated by
-            this AI model should not be considered a medical
-            diagnosis. Always consult a qualified healthcare
-            professional for medical interpretation.
+            This application is developed for educational
+            and research purposes only.
+
+            <br><br>
+
+            The AI-generated results should not be considered
+            a medical diagnosis. Always consult a qualified
+            healthcare professional for medical interpretation.
 
         </div>
 
@@ -490,16 +589,21 @@ st.markdown(
 )
 
 
-# =========================================================
+# ============================================================
 # FOOTER
-# =========================================================
+# ============================================================
 
 st.markdown(
     """
     <div class="footer">
-        Brain Tumor Detection • YOLOv8 • Deep Learning • Streamlit
+        Brain Tumor Detection
+        &nbsp;•&nbsp;
+        YOLOv8
+        &nbsp;•&nbsp;
+        Deep Learning
+        &nbsp;•&nbsp;
+        Streamlit
     </div>
     """,
     unsafe_allow_html=True
 )
-
